@@ -1,0 +1,16 @@
+{
+  "name": "ai-meme-telegram",
+  "version": "0.1.0",
+  "scripts": {
+    "deploy": "firebase deploy"
+  },
+  "dependencies": {
+    "axios": "0.19.2",
+    "lodash": "^4.17.15",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.13.4",
+    "@types/yargs": "^15.0.4"
+  }
+}
