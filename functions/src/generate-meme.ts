@@ -3,20 +3,20 @@ import axios from 'axios'
 import * as querystring from "querystring"
 import * as config from './config.json'
 
-const fetchMemeText = (memeId: string): Promise<AjaxAiMemeResponse> => {
+const fetchMemeText = (memeId: string, imgflipToken: string, imgflipCookie: string): Promise<AjaxAiMemeResponse> => {
   console.debug(`Requesting meme text from imgflip with id "${memeId}"...`)
   return axios.post(
     'https://imgflip.com/ajax_ai_meme',
     querystring.stringify({
       meme_id: memeId,
       init_text: '',
-      __tok: config.imgflipToken
+      __tok: imgflipToken
     }),
     {
       headers: {
         'accept': 'application/json, text/javascript, */*; q=0.01',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'cookie': `iflipsess=${config.imgflipCookie}`
+        'cookie': `iflipsess=${imgflipCookie}`
       }
     }
   )
@@ -48,6 +48,6 @@ const createImage = (memeId: string, text: AjaxAiMemeResponse): Promise<string> 
 }
 
 
-export default (memeId: string): Promise<string> => {
-  return fetchMemeText(memeId).then(memeText => createImage(memeId, memeText))
+export default (memeId: string, imgflipToken: string, imgflipCookie: string): Promise<string> => {
+  return fetchMemeText(memeId, imgflipToken, imgflipCookie).then(memeText => createImage(memeId, memeText))
 }
