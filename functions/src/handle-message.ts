@@ -1,6 +1,10 @@
 import {Message} from './telegram-bot-api'
 import axios from 'axios'
 import * as telegramApiUrl from './telegram-api-url'
+import * as config from './config.json'
+import * as admin from 'firebase-admin'
+
+const db = admin.firestore()
 
 const sendIntroduction = (message: Message) => {
   const createBody = (text: string) => ({chat_id: message.chat.id, parse_mode: 'MarkdownV2', text: text})
@@ -23,6 +27,42 @@ She will be very grateful, I promise\\! 🙏`))
     .catch(console.warn)
 }
 
+const isMaintainerChat: (message: Message) => Promise<boolean> = (message) =>
+  message.chat.type !== 'private' ?
+    Promise.resolve(true) :
+    db.collection('settings')
+      .doc('maintainerChatId')
+      .get()
+      .then(queryResult => message.chat.id === queryResult.get('id'))
+
+const handleSetToken = (message: Message) => isMaintainerChat(message).then(maintainerChat => {
+    if (maintainerChat) {
+      db.collection('settings').doc('token').set({token: message.text.trim().split(' ')[1]})
+        .catch(reason => console.error(`Could not set token:\n${reason}`))
+    }
+  })
+
+const handleSetCookie = (message: Message) => isMaintainerChat(message).then(maintainerChat => {
+  if (maintainerChat) {
+    db.collection('settings').doc('cookie').set({cookie: message.text.trim().split(' ')[1]})
+      .catch(reason => console.error(`Could not set cookie:\n${reason}`))
+  }
+})
+
+const handleSetMaintainerChatId = (message: Message) => {
+  db.collection('settings').doc('maintainerChatId').set({id: message.chat.id})
+    .catch(reason => console.error(`Could not set maintainerChatId\n${reason}`))
+}
+
 export default (message: Message): void => {
-  if (message.text === '/start' && message.chat.type === 'private') sendIntroduction(message)
+  if (message.from.username === config.maintainer && message.chat.type === 'private') {
+    console.debug(`Found maintainer chat: ${message.chat.username} (${message.chat.id})`)
+    handleSetMaintainerChatId(message)
+  }
+
+  if (message.text === '/start' && message.chat.type === 'private') {
+    sendIntroduction(message)
+  } else if (message.text && message.text.trim().startsWith('token')) {
+    handleSetToken(message)
+  } else if (message.text && message.text.trim().startsWith('cookie')) handleSetCookie(message)
 }

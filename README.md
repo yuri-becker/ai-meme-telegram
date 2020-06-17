@@ -26,20 +26,38 @@ Copy ```functions/src/config.json.template``` to ```functions/src/config.json```
 *  `telegramBotToken` is your bot's token which was provided by the BotFather when you set up the bot.
 * `imgflipUsername` username of any imgflip account (set one up [here](https://imgflip.com/signup))
 * `imgflipPassword` the account's password - in unencoded text
-* `imgflipToken` this is where it gets dodgy. 
+* `maintainer` your telegram handle/username **without the leading @**
+ * `selfUrl` the url the functions will be available at
+
+### 5. Setup/Maintenance via chat
+
+Message the bot you created in a private message a `/start`. 
+
+After that it will remember this chat as the maintainer chat and report errors in this chat.
+
+You need to set/maintain two properties via this chat.
+
+* **The imgFlip token** - this is where it gets dodgy. 
   
   Open [https://imgflip.com/ai-meme](https://imgflip.com/ai-meme) in your browser (preferably a private tab), open the DevTools and go the the Network tab. 
   
   Now click on one of the memes. You'll see a POST to `ajax_ai_meme`. In the Form Data there'll be a __tok. Copy the value and set it as your `imgflipToken`
   
-  I couldn't find out whether this token will be invalidated and some point or not, so please check up on it every other while.
+  The token might be getting invalidated every so often, so if you get an error via the maintainer chat, try getting a fresh token and setting it.
   
- * `imgflipCookie` from the same request, the cookie `iflipsess`
+ * **The imgflip Cookie**
+   
+    from the same request, the cookie `iflipsess`
  
    i.e. in the Headers there will be a cookie string like `__cfduid=abcdef; iflipsess=XXX; rootkey=abcdef` - copy the `XXX`
- * `selfUrl` the url the functions will be available at
+   
+To set these simply send in two separate messages:
 
-### 5. bot-utils.js
+* `token <token>`, e.g. `token  aBcDeFgHijKlMnOpQrStUvbWjabBq2NK292NfUsZHEc=`
+
+* `cookie <cookie>`, e.g. `cookie abcdef9ghni1klmioi12msdbaj`
+
+### 6. bot-utils.js
 bot-utils.js in the project root is a small commandline-tool for one-time setup with Telegram and health-checking after deployment.
 
 Execute with ```node bot-utils.js``` and see usage with ```node bot-utils.js --help``` 

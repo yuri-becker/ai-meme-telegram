@@ -1,4 +1,7 @@
 import * as functions from 'firebase-functions'
+import * as admin from 'firebase-admin'
+
+admin.initializeApp(functions.config().firebase)
 import * as telegramWebhookPath from './telegram-webhook-path'
 import handleInlineQuery from './handle-inline-query'
 import handleChosenInlineResult from './handle-chosen-inline-result'
